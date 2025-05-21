@@ -8,20 +8,23 @@ from cv_bridge import CvBridge
 
 def gstreamer_pipeline(
         sensor_id=0,
-        capture_width=640,
-        capture_height=480,
-        display_width=640,
-        display_height=480,
+        capture_width=320, 
+        capture_height=240, 
+        display_width=320,
+        display_height=240,
         framerate=30,
         flip_method=1,
     ):
         return (
-            "nvarguscamerasrc sensor_mode=1 sensor-id=%d !"
-            "video/x-raw(memory:NVMM), width=(int)%d, height=(int)%d, framerate=(fraction)%d/1 ! "
+            "nvarguscamerasrc sensor_mode=1 sensor-id=%d ! "
+            "queue max-size-buffers=3 ! "
+            "video/x-raw(memory:NVMM),width=(int)%d,height=(int)%d,framerate=(fraction)%d/1 ! "
             "nvvidconv flip-method=%d ! "
-            "video/x-raw, width=(int)%d, height=(int)%d, format=(string)BGRx ! "
+            "queue ! "
+            "video/x-raw,width=(int)%d,height=(int)%d,format=(string)BGRx ! "
             "videoconvert ! "
-            "video/x-raw, format=(string)BGR ! appsink"
+            "queue ! "
+            "video/x-raw,format=(string)BGR ! appsink"
             % (
                 sensor_id,
                 capture_width,
@@ -38,7 +41,7 @@ class CsiCameraReaderNode(Node):
     def __init__(self):
         super().__init__('csi_camera_reader_node')
         self.publisher_ = self.create_publisher(Image, 'camera/image_raw', 10)
-        timer_period = 0.1  # 10 FPS
+        timer_period = 1/30 # 10 FPS
         self.timer = self.create_timer(timer_period, self.timer_callback)
         self.bridge = CvBridge()
 
