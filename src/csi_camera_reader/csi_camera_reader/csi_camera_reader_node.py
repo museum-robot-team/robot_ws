@@ -10,14 +10,14 @@ def gstreamer_pipeline(
         sensor_id=0,
         capture_width=320, 
         capture_height=240, 
-        display_width=320,
-        display_height=240,
-        framerate=30,
-        flip_method=1,
+        display_width=160,
+        display_height=120,
+        framerate=5,
+        flip_method=0,
     ):
         return (
             "nvarguscamerasrc sensor_mode=1 sensor-id=%d ! "
-            "queue max-size-buffers=3 ! "
+            "queue max-size-buffers=1 leaky=downstream ! "
             "video/x-raw(memory:NVMM),width=(int)%d,height=(int)%d,framerate=(fraction)%d/1 ! "
             "nvvidconv flip-method=%d ! "
             "queue ! "
@@ -40,10 +40,12 @@ class CsiCameraReaderNode(Node):
 
     def __init__(self):
         super().__init__('csi_camera_reader_node')
-        self.publisher_ = self.create_publisher(Image, 'camera/image_raw', 10)
-        timer_period = 1/30 # 10 FPS
+        self.publisher_ = self.create_publisher(Image, 'camera/image_raw', 1)
+        timer_period = 1/10 # 10 FPS
         self.timer = self.create_timer(timer_period, self.timer_callback)
         self.bridge = CvBridge()
+
+
 
         # GStreamer pipeline for Jetson Nano CSI camera
         self.cap = cv2.VideoCapture(
@@ -58,6 +60,7 @@ class CsiCameraReaderNode(Node):
         if ret:
             msg = self.bridge.cv2_to_imgmsg(frame, encoding='bgr8')
             self.publisher_.publish(msg)
+            del frame
         else:
             self.get_logger().warn('No frame received from camera.')
 
