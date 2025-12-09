@@ -25,8 +25,9 @@ setup(
     tests_require=['pytest'],
 entry_points={
     'console_scripts': [
-        'servo_node = servo_control.servo_node:main',
+        'multi_servo_node = servo_control.multi_servo_node:main',
         'camera_tracker = servo_control.camera_tracker:main',
+        'arm_animation = servo_control.arm_animation:main',
     ],
 },
 )
