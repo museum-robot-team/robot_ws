@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>arduino_diff</name>
+  <version>0.0.1</version>
+  <description>Arduino differential drive odometry interface using ROSArduinoBridge protocol</description>
+
+  <maintainer email="you@example.com">YourName</maintainer>
+  <license>Apache-2.0</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <exec_depend>rclpy</exec_depend>
+  <exec_depend>geometry_msgs</exec_depend>
+  <exec_depend>nav_msgs</exec_depend>
+  <exec_depend>tf2_ros</exec_depend>
+  <exec_depend>tf_transformations</exec_depend>
+
+  <export />
+</package>
